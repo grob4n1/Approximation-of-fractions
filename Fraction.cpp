@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cstdint>
 #include <cmath>
 #include <chrono>
@@ -254,16 +255,31 @@ int main(){
     Fraction frac5 = aprFareyRowsFast(3.14159, 0.0001, 30);
     std::cout << frac5 << '\n';
 
-    const size_t size = 1000000;
+    constexpr size_t size = 1000;
+    static double time_test[size];
     static Fraction temp[size];
-    auto time_start = std::chrono::steady_clock().now();
-    for(size_t i = 0; i < size; i++){
-        temp[i] = aprFareyRowsFast(3.14149265358979, 0.00000000000000001, 1000);
-    }
-    auto time_end = std::chrono::steady_clock().now();
-    double diff = std::chrono::duration_cast<std::chrono::nanoseconds> (time_end - time_start).count();
-    std::cout << (diff / size) << "ns\n";
-     
 
+    for(int j = 0; j < size; j++){
+            auto time_start = std::chrono::steady_clock().now();
+        for(size_t i = 0; i < j; i++){
+            temp[i] = apr(3.14149265358979, 0.00000000000000001, 1000);
+        }
+        auto time_end = std::chrono::steady_clock().now();
+        double diff = std::chrono::duration_cast<std::chrono::nanoseconds> (time_end - time_start).count();
+        time_test[j] = diff;
+    }
+    
+    //std::cout << (diff / size) << "ns\n";
+    std::cout << time_test[10];
+     
+    const char* time_apr_path = "time_apr.txt";
+    std::ofstream time_apr_file;
+    time_apr_file.open(time_apr_path);
+    if (time_apr_file.is_open()) {
+        for(int i = 0; i < size; i++){
+            time_apr_file << time_test[i] << '\n';
+        }
+        time_apr_file.close();
+    }
     
 }

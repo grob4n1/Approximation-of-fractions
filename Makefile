@@ -1,11 +1,17 @@
-all: rebuild
+all: build
 
 rebuild: clean build
 
 .ONESHELL:
-build:
+build: graph_venv
+	.\graph_venv\Scripts\activate && python .\create_graph.py && deactivate
+
+graph_venv:
 	python -m venv graph_venv
-	.\graph_venv\Scripts\activate && pip install matplotlib && python .\create_graph.py && deactivate
+	.\graph_venv\Scripts\activate && pip install matplotlib && deactivate
+
+
+
 
 
 clean:
