@@ -1,0 +1,49 @@
+@startuml
+ApproxAlg<|--FractionFarey
+ApproxAlg<|--FractionApr
+ApproxAlg<|--FractionUser
+Test o-- Fraction
+ApproxAlg o-- Fraction
+Test o-- ApproxAlg
+
+class Fraction{
+  +num Integer
+  +den Integer
+  +Fraction(Integer, Integer)
+}
+
+abstract class ApproxAlg{
+  +approx(Real) Fraction
+}
+
+class FractionFarey{
+  +val Real
+  +minErr Real
+  +maxIter Integer
+  +FractionFarey(Real, Real, Integer)
+  +approx(Real)
+}
+
+
+class FractionUser{
+
+}
+
+class FractionApr{
+  +val Real
+  +minErr Real
+  +maxDen Integer
+  +FractionApr(Real, Real, Integer)
+  +approx(Real)
+}
+
+class Test{
+  -testCycles Integer
+  -values[] Real
+  -ansewers[] Fraction
+  +time[] Integer
+  +generate(Integer, Alg: <<function>>(Integer): Fraction)
+  +time_test(ApproxAlg)
+}
+
+@enduml
