@@ -248,10 +248,12 @@ private:
     std::vector<Fraction> ansewers;
 public:
     std::vector<uint64_t> time;
+    std::vector<uint64_t> delta_time;
     void generate(size_t size, Fraction (*genFraction)(size_t)){
         values.resize(size);
         ansewers.resize(size);
         time.resize(size);
+        delta_time.resize(size - 1);
         for(size_t i = 0; i < size; ++i){
             ansewers[i] = genFraction(i);
             values[i] = (float)ansewers[i].num  / (float)ansewers[i].den;
@@ -259,18 +261,29 @@ public:
     }
     void time_test(ApproxAlg* alg){
         for(size_t i = 0; i < values.size(); i++){
-            float valuesi = values[i];
-            auto time_start = std::chrono::steady_clock().now();
-            for(size_t j = 0; j < i; j++){
-                Fraction temp = alg->approx(valuesi);
+            double diff[10];
+            for(size_t k = 0; k < 10; k++){
+                float valuesi = values[i];
+                auto time_start = std::chrono::steady_clock().now();
+                for(size_t j = 0; j < i; j++){
+                    Fraction temp = alg->approx(valuesi);
+                }
+                auto time_end = std::chrono::steady_clock().now();
+                double diff1 = std::chrono::duration_cast<std::chrono::nanoseconds> (time_end - time_start).count();
+                diff[k] = diff1;
+                // if(temp != ansewers[i]){
+                //     // TODO:
+                //     // cout << 
+                // }
             }
-            auto time_end = std::chrono::steady_clock().now();
-            double diff = std::chrono::duration_cast<std::chrono::nanoseconds> (time_end - time_start).count();
-            time[i] = diff;
-            // if(temp != ansewers[i]){
-            //     // TODO:
-            //     // cout << 
-            // }
+            double sum_diff;
+            for(size_t k = 0; k < 10; k++){
+                sum_diff += diff[k];
+            }
+            time[i] = sum_diff / 10;
+        }
+        for(size_t i = 0; i < delta_time.size(); i++){
+            delta_time[i] = static_cast<float>(time[i + 1]) / static_cast<float>(time[i]);
         }
     }
 
@@ -282,13 +295,6 @@ public:
 
 int main(){
 
-
-    Fraction frac3 = apr(0.1428, 0.01, 10);
-    std::cout << frac3  << '\n';
-    Fraction frac4(3.14159, 0.0001, 30);
-    std::cout << frac4  << '\n';
-    Fraction frac5 = aprFareyRowsFast(3.14159, 0.0001, 30);
-    std::cout << frac5 << '\n';
 
     constexpr size_t size = 1000;
     static double time_test[size];
@@ -333,6 +339,11 @@ int main(){
             time_apprFarey_file << test1.time[i] << '\n';
         }
         time_apprFarey_file.close();
+    }
+    for(int i = 0; i < 999; i++){
+        if(test1.delta_time[i] > 1.00001){
+            std::cout << i << '\n';
+        }
     }
 
 }
